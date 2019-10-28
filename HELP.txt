@@ -1,0 +1,91 @@
+// Challenge Menu help
+If HELPTYPE=1
+	FillScreen(222
+	SetTextScale(1,1
+	SetTextBGColor(222
+	SetTextFGColor(0
+	PrintStringXY("Controls:",5,5
+	PrintStringXY("Use the up and down arrow keys to select a",10,20
+	PrintStringXY("challenge",10,30
+	PrintStringXY("Press [y=] to access Shop",10,50
+	PrintStringXY("Press [enter], [2nd], or [graph] to start",10,70
+	PrintStringXY("challenge",10,80
+	PrintStringXY("The current number of points is displayed at",5,110
+	PrintStringXY("the bottom of the screen",5,120
+	SwapDraw
+	Repeat KEY
+		getKey->KEY
+	End
+	0->KEY
+	Blit(1
+End
+
+// Shop help
+If HELPTYPE=2
+	FillScreen(222
+	SetTextBGColor(222
+	SetTextFGColor(0
+	PrintStringXY("Controls:",5,5
+	PrintStringXY("Use the arrow keys to select an upgrade",15,20
+	PrintStringXY("Press [2nd] or [enter] to purchase upgrade",15,40
+	PrintStringXY("or open reset options",15,50
+	SwapDraw
+	Repeat KEY
+		getKey->KEY
+	End
+	0->KEY
+	Blit(1
+End
+
+// Lock Picking help
+If HELPTYPE=3
+	FillScreen(222
+	SetTextBGColor(222
+	SetTextFGColor(0
+	PrintStringXY("Controls:",5,5
+	PrintStringXY("Use the up and down arrow keys to move",15,20
+	PrintStringXY("the p\ins",15,30
+	PrintStringXY("Press [zoom] to view codebook",15,50
+	PrintStringXY("How to Play:",5,70
+	PrintStringXY("The goal is to solve the lock by moving the",15,90
+	PrintStringXY("p\ins up or down until the combination",15,100
+	PrintStringXY("matches the answer to the clue",15,110
+	PrintStringXY("Scoring:",5,130
+	PrintStringXY("Correct move:          +100 points",15,150
+	PrintStringXY("Incorrect move:     -100 points",15,160
+	SwapDraw
+	Repeat KEY
+		getKey->KEY
+	End
+	0->KEY
+	Blit(1
+End
+
+// Computer Hacking help
+If HELPTYPE=4
+	FillScreen(222
+	SetTextBGColor(222
+	SetTextFGColor(0
+	PrintStringXY("Controls:",5,5
+	PrintStringXY("Use the up and down arrow keys to select",15,20
+	PrintStringXY("a file",15,30
+	PrintStringXY("Press [2nd] or [enter] to hack a file",15,50
+	PrintStringXY("Press [zoom] to activate the Anti-Scan tool",15,70
+	PrintStringXY("How to Play:",5,90
+	PrintStringXY("The goal is to hack a certain number of files",15,110
+	PrintStringXY("(shown on the left of the control panel)",15,120
+	PrintStringXY("while avoiding the Anti-Spyware scanner",15,130
+	PrintStringXY("Each file the scanner selects will be",15,145
+	PrintStringXY("marked by a red box around the file name",15,155
+	PrintStringXY("Each time the player makes a successful",15,170
+	PrintStringXY("hack, the recharge bar will increment by one",15,180
+	PrintStringXY("Scoring:",5,200
+	PrintStringXY("Each successful hack:      +100 points",15,210
+	PrintStringXY("Each scanner alarm:            -100 points",15,220
+	SwapDraw
+	Repeat KEY
+		getKey->KEY
+	End
+	0->KEY
+	Blit(1
+End

@@ -1,0 +1,58 @@
+// Draw banner
+SetDraw(0
+For(X,0,240
+	SetColor(180
+	FillRectangle(98,X,124,1
+	SetColor(107
+	FillRectangle(99,X,122,1
+	SetColor(0
+	FillRectangle(100,X,120,1
+End
+Blit(0
+SetDraw(1
+SetTextScale(1,2
+SetTextBGColor(0
+SetTextFGColor(102
+SetTextTransparentColor(0
+PrintStringXY("CHALLENGE",124,60
+PrintStringXY("COMPLETE",128,80
+SetColor(255
+Line(110,110,210,110
+Line(110,144,210,144
+SetTextFGColor(255
+PrintStringXY("Points:",115,120
+SetColor(0
+
+// Print points
+For(X,1,POINTS/1000
+	FillRectangle(165,120,50,15
+	SetTextXY(165,120
+	PrintUInt(1000*X,5
+	Blit(1
+End
+FillRectangle(165,120,50,15
+SetTextXY(165,120
+PrintUInt(POINTS,5
+Blit(1
+
+// Print 'New level unlocked' message if new level unlocked
+If PROGRESS=0 and CURRWEEK=WEEK and WEEK<10
+	Pause 1000
+	SetTextScale(1,1
+	For(X,1,2
+		If X=1
+			SetTextFGColor(255
+		Else
+			SetTextFGColor(224
+		End
+		PrintStringXY("New level",130,170
+		PrintStringXY("Unlocked!",128,180
+		Blit(1
+		Pause 100
+	End
+End
+
+Repeat KEY
+	getKey->KEY
+End
+0->KEY

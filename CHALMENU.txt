@@ -1,0 +1,215 @@
+// This is the Challenge menu. The player can either select a puzzle or go to the Shop
+
+Repeat KEY=15
+
+	// Draw menu
+	FillScreen(181
+
+	// Draw lines and titles
+	SetTextScale(1,1
+	SetTextBGColor(181
+	SetTextFGColor(0
+	SetTextTransparentColor(255
+	PrintStringXY("CHALLENGE",10,50
+	PrintStringXY("CONDITION",235,50
+	SetColor(0
+	Line_NoClip(8,60,110,60
+	Line_NoClip(208,60,310,60
+
+	// Draw Challenges
+	Rectangle(4,75,312,102
+	SetColor(255
+	FillRectangle(5,76,310,100
+	SetTextBGColor(255
+	PrintStringXY("Lock Picking",10,81
+	PrintStringXY("Computer Hacking",10,96
+	2->NUMPUZZLES
+
+	// Draw 'Shop' and 'Continue' buttons
+	SetColor(0
+	FillRectangle(5,220,60,20
+	FillRectangle(235,220,80,20
+	SetTextBGColor(0
+	SetTextFGColor(255
+	SetTextTransparentColor(0
+	PrintStringXY("Shop",20,225
+	PrintStringXY("Continue >",240,225
+
+	// Draw points
+	SetTextScale(2,2
+	SetTextXY(120,218
+	SetTextBGColor(181
+	SetTextFGColor(0
+	SetTextTransparentColor(255
+	PrintUInt(POINTS,5
+
+	// 'E' is the escape variable that is true if player 'clicks' something
+	// or presses [clear]
+	0->E
+
+	// Selection box loop
+	Repeat E
+		
+		// Draw Week
+		SetColor(181
+		FillRectangle(85,10,165,21
+		SetTextScale(2,3
+		SetTextBGColor(181
+		SetTextFGColor(0
+
+		// 'P' is the temporary variable that holds the current week's 
+		// progress
+		If CURRWEEK<10
+			115->P
+		Else
+			105->P
+		End
+		PrintStringXY("Week",P,10
+		SetTextXY(P+70,10
+		PrintUInt(CURRWEEK,1+(CURRWEEK=10
+
+		// Draw arrows for selecting week number
+		SetTextScale(2,2
+		If CURRWEEK>1
+			PrintStringXY("<",85,13
+		End
+		If CURRWEEK<WEEK
+			PrintStringXY(">",215,13
+		End
+
+		// If viewing a previously completed Week, make sure that all are
+		// marked 'Completed'
+		If CURRWEEK=WEEK
+			PROGRESS->P
+		Else
+			NUMPUZZLES->P
+		End
+
+		// Print condition labels according to PROGRESS
+		SetColor(255
+		SetTextScale(1,1
+		SetTextBGColor(255
+		For(X,1,NUMPUZZLES
+			81+15*(X-1->A
+			FillRectangle(227,A,83,10
+			If P>(X-1
+				SetTextFGColor(101
+				PrintStringXY("Completed",242,A
+			End
+			If P+1=X
+				SetTextFGColor(228
+				PrintStringXY("In Progress",227,A
+			End
+			If P<(X-1
+				SetTextFGColor(0
+				PrintStringXY("Assigned",249,A
+			End
+		End
+
+		Repeat KEY=2 or KEY=3 or E
+
+			//Draw selection box
+			SetColor(0
+			Rectangle(8,78+15*(SELECT-1),130,14
+
+			Blit(1
+			Repeat KEY
+				getKey->KEY
+			End
+
+			// Check to see if key pressed is an escape key
+			If KEY=54 or KEY=9 or KEY=53 or KEY=49 or KEY=55 or KEY=15
+				1->E
+			End
+			
+			// Erase selection box
+			SetColor(255
+			Rectangle(8,78+15*(SELECT-1),130,14
+
+			SELECT-(KEY=4 and SELECT>1)+(KEY=1 and SELECT<(P+1-(P>=NUMPUZZLES->SELECT
+			CURRWEEK-(KEY=2 and CURRWEEK>1)+(KEY=3 and CURRWEEK<WEEK->CURRWEEK
+
+			// Reset SELECT when Week is changed so the player cannot 
+			// accidently access assigned challenges
+			If KEY=2 or KEY=3
+				1->SELECT
+			End
+
+		End
+
+	End // Repeat E
+
+	// If [mode] pressed, display help
+	If KEY=55
+		1->HELPTYPE
+		Call GAMEAID
+	End
+
+	// If [y=], open Shop
+	If KEY=53
+		181->BGCOLOR
+		Call DOORS
+		AsmComp(SHOP
+		Call DOORS
+	End
+
+	If KEY=54 or KEY=9 or KEY=49
+
+		// First challenge: Lock Picking
+		If SELECT=1
+			106->BGCOLOR
+			Call DOORS
+			AsmComp(LOCKPICK
+		End
+
+		// Second challenge: Computer Hacking
+		If SELECT=2
+			222->BGCOLOR
+			Call DOORS
+			AsmComp(COMPHACK
+		End
+
+		If KEY!=15
+
+			// This code block handles the player's progress and ensures
+			// that only valid progressions are made from challenge to
+			// challenge and from Week to Week
+			If WEEK=CURRWEEK
+				If SELECT=PROGRESS+1
+					If PROGRESS+1<NUMPUZZLES
+						PROGRESS+1->PROGRESS
+						If WEEK<10 or (WEEK=10 and PROGRESS!=NUMPUZZLES
+							SetColor(255
+							Rectangle(8,78+15*(SELECT-1),130,14
+							SELECT+1->SELECT
+						End
+					Else
+						If WEEK<10
+							WEEK+1->WEEK
+							WEEK->CURRWEEK
+							0->PROGRESS
+							1->SELECT
+						Else
+							PROGRESS+(MAXOUT!=1->PROGRESS
+							1->MAXOUT
+						End
+					End
+				End
+			End
+
+			// Win animation
+			AsmComp(WINANIMA
+			
+		End
+
+		181->BGCOLOR
+		Call DOORS
+
+		// Zero the key variable to prevent "fall throughs" 
+		0->KEY
+
+	End	//If KEY=54 or KEY=9 or KEY=49
+
+End // Repeat KEY=15
+
+0->KEY

@@ -1,0 +1,138 @@
+// These are the rounded-corner box routines
+Goto DOWN
+Lbl NOFILL
+Rectangle(X+1,Y-1,W-2,H+2
+Rectangle(X-1,Y+1,W+2,H-2
+Return
+Lbl FILL
+FillRectangle(X+1,Y-1,W-2,H+2
+FillRectangle(X-1,Y+1,W+2,H-2
+Return
+Lbl DOWN
+
+// Draw dialog box
+SetColor(180
+56->X
+46->Y
+208->W
+148->H
+Call NOFILL
+SetColor(107
+57->X
+47->Y
+206->W
+146->H
+Call NOFILL
+SetColor(0
+58->X
+48->Y
+204->W
+144->H
+Call NOFILL
+SetColor(181
+59->X
+49->Y
+202->W
+142->H
+Call NOFILL
+SetColor(0
+60->X
+50->Y
+200->W
+140->H
+Call NOFILL
+SetColor(222
+61->X
+51->Y
+198->W
+138->H
+Call FILL
+
+SetColor(180
+96->X
+36->Y
+128->W
+28->H
+Call NOFILL
+SetColor(107
+97->X
+37->Y
+126->W
+26->H
+Call NOFILL
+SetColor(0
+98->X
+38->Y
+124->W
+24->H
+Call NOFILL
+SetColor(181
+99->X
+39->Y
+122->W
+22->H
+Call NOFILL
+SetColor(0
+100->X
+40->Y
+120->W
+20->H
+Call NOFILL
+SetColor(222
+101->X
+41->Y
+118->W
+18->H
+Call FILL
+
+// Print message
+SetTextBGColor(222
+"Are you sure?->Str0
+"Only 60% of the total amount->Str9
+"of points spent will be->Str8
+"refunded->Str7
+PrintStringXY(Str0,160-GetStringWidth(Str0)/2,45
+PrintStringXY(Str9,160-GetStringWidth(Str9)/2,80
+PrintStringXY(Str8,160-GetStringWidth(Str8)/2,90
+PrintStringXY(Str7,160-GetStringWidth(Str7)/2,100
+
+PrintStringXY("YES",145,130
+PrintStringXY("NO",145,145
+
+SwapDraw
+SetDraw(0
+
+SetColor(222
+
+130->S
+
+// Cursor loop
+Repeat KEY=54 or KEY=9 or KEY=15
+	PrintStringXY(">",135,S
+	Repeat KEY
+		getKey->KEY
+	End
+	FillRectangle(135,S,5,8
+	S+15*(KEY=1 and S<145)-15*(KEY=4 and S>130->S
+End
+
+SetDraw(1
+
+// Refund player 60% of the total points spent and redraw lock icons
+If S=130 and KEY!=15
+	POINTS+1200*(UPGRADEI>=2)+2400*(UPGRADEI>=3)+3600*(UPGRADEI>=4)+4800*(UPGRADEI=5->POINTS
+	POINTS+1200*(UPGRADEII>=2)+2400*(UPGRADEII>=3)+3600*(UPGRADEII>=4)+4800*(UPGRADEII=5->POINTS
+	1->UPGRADEI
+	1->UPGRADEII
+	For(X,0,3
+		For(Y,0,3
+			Sprite(LOCKED,20+50*Y,155-40*X
+		End
+	End
+End
+
+// Reset selection box
+Call IERASE
+1->XPOS
+1->YPOS
+0->KEY

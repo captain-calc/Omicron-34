@@ -1,0 +1,49 @@
+// Draw Attempts panel
+SetColor(0
+FillRectangle(2,2,52,22
+SetColor(181
+For(X,0,2
+	FillRectangle(8+15*X,8,10,10
+End
+
+// Draw panel
+SetColor(0
+FillRectangle(20,220,280,20
+SetTextScale(1,1
+SetTextBGColor(0
+SetTextTransparentColor(155
+
+// Depending on challenge, draw tool name in center of panel and either
+// current week or HACKGOAL
+// If Anti-Scan tool unlocked, draw recharge bar
+SetTextFGColor(62
+If SELECT=1
+	PrintStringXY("Codebook",128,225
+	SetTextFGColor(255
+	PrintStringXY("WEEK:",35,225
+	SetTextXY(75,225
+	PrintUInt(CURRWEEK,2
+End
+If SELECT=2
+	SetTextFGColor(255
+	PrintStringXY("GOAL:",35,225
+	SetTextXY(75,225
+	PrintUInt(HACKGOAL,2
+	If UPGRADEII>1
+		SetTextFGColor(62
+		PrintStringXY("Anti-Scan",127,225
+		SetColor(0
+		FillRectangle(210,2,108,22
+		SetColor(126
+		For(X,0,9
+			FillRectangle(216+10*X,8,6,10
+		End
+	End
+End
+SetTextFGColor(255
+PrintStringXY(":",110,225
+PrintStringXY(":",205,225
+PrintStringXY("PTS:",225,225
+SetTextXY(255,225
+PrintUInt(POINTS,5
+SetTextTransparentColor(255

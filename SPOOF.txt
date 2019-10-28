@@ -1,0 +1,45 @@
+FillScreen(158
+SetTextBGColor(158
+
+Repeat KEY
+	40->A
+	240-C->B
+	Call ICON
+	Sprite(CDBKUPI,47,B+6
+	SetColor(158
+	FillRectangle(40,B+29,30,2
+	100->A
+	320-D->B
+	Call ICON
+	Sprite(ANTISCUPII,107,B+6
+	SetColor(158
+	FillRectangle(100,B+29,30,2
+	180->A
+	360-E->B
+	Call ICON
+	Sprite(CDBKUPIV,187,B+6
+	SetColor(158
+	FillRectangle(180,B+29,30,2
+	280->A
+	280-F->B
+	Call ICON
+	Sprite(ANTISCUPIII,287,B+6
+	SetColor(158
+	FillRectangle(280,B+29,30,2
+	
+	SetTextScale(2,2
+	PrintStringXY("Stay tuned for more",25,60
+	PrintStringXY("updates on Omicron 34!",7,85
+	SetTextScale(1,1
+	PrintStringXY("The world's first and",89,120
+	PrintStringXY("only calculator-based,",82,135
+	PrintStringXY("online special agent",92,150
+	PrintStringXY("academy!",130,165
+	Blit(1
+	C+1-C*(C>280->C
+	D+1-D*(D>360->D
+	E+1-E*(E>400->E
+	F+1-F*(D>320->F
+	getKey->KEY
+End
+0->KEY

@@ -1,0 +1,294 @@
+[i]MICRON34
+[i]"000003333330000000033CCCCCC33000003CCFFFFFFCC30003CCF333333FCC3003CF3DDDDDD3FC303CF3D00FFFDD3FC33CF3D0F33FFD3FC33CF3DF3EE3FD3FC33CF3DF3EE3FD3FC33CF3DFF33FFD3FC33CF3DDFFFFDD3FC303CF3DDDDDD3FC3003CCF333333FCC30003CCFFFFFFCC30000033CCCCCC330000000033333300000"
+[i]Omicron 34
+
+// If OmicronC and/or OmicronU is not present, throw an error
+0->A->B->R
+If Detect(0,"OmicronC")=0
+	ClrHome
+	Output(0,0,"Appvar OmicronC.8xv
+	Output(1,0,"not found!"
+	1->A
+End
+If Detect(0,"OmicronU")=0
+	R+3*(A=1->R
+	Output(0+R,0,"Appvar OmicronU.8xv
+	Output(1+R,0,"not found!
+	1->B
+End
+If A or B
+	If R
+		Output(6,0,"Please send these files
+	Else
+		Output(3,0,"Please send this file
+	End
+	Output(4+R,0,"to your calculator
+	Repeat KEY
+		getKey->KEY
+	End
+	ClrHome
+	Return
+End
+
+// Check for the save appvar, OmicronS; if non-existant, set WEEK to 1 and
+//POINTS and PROGRESS to 0
+If Detect(0,"OmicronS")=0
+	Open("OmicronS","w+"->SLOT
+	If SLOT=0
+		ClrHome
+		Output(0,0,"Failed to open
+		Output(1,0,"OmicronS.8xv
+		Output(3,0,"Please report this error
+		Output(4,0,"in this Cemetech thread:
+		Output(5,0,"cemetech/t16070
+		Pause 
+		ClrHome
+		Return
+	End
+	Write("OmicronS",8,1,SLOT
+	1->A
+	Write(^^oA,3,1,SLOT
+	0->A
+	Write(^^oA,3,1,SLOT
+	Write(^^oA,3,1,SLOT
+	Write(^^oA,3,1,SLOT
+	1->A
+	Write(^^oA,3,1,SLOT
+	Write(^^oA,3,1,SLOT
+End
+
+CloseAll
+
+// All of the contents of OmicronS are retrieved and stored to variables
+Open("OmicronS","r"->SLOT
+Seek(8,0,SLOT
+Alloc(3->WEEK
+Read(^^oWEEK,3,1,SLOT
+|EWEEK->WEEK
+Alloc(3->POINTS
+Read(^^oPOINTS,3,1,SLOT
+|EPOINTS->POINTS
+Alloc(3->PROGRESS
+Read(^^oPROGRESS,3,1,SLOT
+|EPROGRESS->PROGRESS
+Alloc(3->MAXOUT
+Read(^^oMAXOUT,3,1,SLOT
+|EMAXOUT->MAXOUT
+Alloc(3->UPGRADEI
+Read(^^oUPGRADEI,3,1,SLOT
+|EUPGRADEI->UPGRADEI
+Alloc(3->UPGRADEII
+Read(^^oUPGRADEII,3,1,SLOT
+|EUPGRADEII->UPGRADEII
+CloseAll
+
+// This will save the week number to CURRWEEK, so when the game opens the
+// latest week will appear, but will allow the player to select the
+// desired week without the program resetting the Week number every time
+// the Challenge Menu opens
+WEEK->CURRWEEK
+
+// Places the selection box in the Challenge Menu according to current Week
+If CURRWEEK=WEEK
+	If MAXOUT!=1
+		PROGRESS+1->SELECT
+	Else
+		PROGRESS->SELECT
+	End
+End
+
+// Define all of the sprites
+AsmComp(SPRITES
+
+Begin
+SetDraw(1
+
+1->SELECTION
+
+Repeat KEY=15
+
+	// Draw the main menu
+	FillScreen(222
+	SetColor(0
+	FillTriangle(0,0,0,50,50,0
+	FillTriangle(320,240,320,190,270,240
+	SetColor(222
+	FillTriangle(0,0,0,40,40,0
+	FillTriangle(320,240,320,200,280,240
+	SetColor(0
+	FillTriangle(0,0,0,30,30,0
+	FillTriangle(320,240,320,210,290,240
+	SetColor(222
+	FillTriangle(0,0,0,20,20,0
+	FillTriangle(320,240,320,220,300,240
+	
+	SetTextScale(3,4
+	SetTextBGColor(222
+	SetTextFGColor(0
+	PrintStringXY("Omicron 34",50,20
+	SetColor(0
+	Rectangle(120,90,70,75
+	For(X,0,3
+		FillRectangle(130,100+15*X,5,7
+	End
+	SetTextScale(1,1
+	SetTextFGColor(0
+	SetTextTransparentColor(255
+	PrintStringXY("PLAY",140,100
+	PrintStringXY("HELP",140,115
+	PrintStringXY("ABOUT",140,130
+	PrintStringXY("EXIT",140,145
+
+	// Selection arrow loop
+	Repeat KEY=54 or KEY=9 or KEY=15
+		PrintStringXY(">",130,100+15*(SELECTION-1)
+		Blit(1
+		Repeat KEY
+			getKey->KEY
+		End
+
+		// Erase arrow
+		If KEY=1 or KEY=4
+			SetColor(0
+			FillRectangle(130,100+15*(SELECTION-1),5,7
+		End
+		If KEY=1
+			SELECTION+1-4*(SELECTION=4->SELECTION
+		End
+		If KEY=4
+			SELECTION-1+4*(SELECTION=1->SELECTION
+		End
+	End
+
+	Goto END
+	// This is the door animation
+	Lbl DOORS
+	SetDraw(0
+	For(X,0,160
+		SetColor(0
+		FillRectangle(X,0,1,240
+		FillRectangle(319-X,0,1,240
+		If X>10
+			SetColor(107
+			FillRectangle(X-10,10,1,220
+			FillRectangle(329-X,10,1,220
+		End
+	End
+	Pause 1000
+	For(X,0,160
+		If X<=150
+			SetColor(0
+			FillRectangle(150-X,0,10,240
+			FillRectangle(170+X,0,10,240
+		End
+		SetColor(BGCOLOR
+		FillRectangle(160-X,0,5,240
+		FillRectangle(160+X,0,5,240
+	End
+	SetDraw(1
+	Return
+
+	// This is the help for all of the menus and challenges
+	Lbl GAMEAID
+	AsmComp(HELP
+	Return
+
+	Lbl END
+
+	If KEY=54 or KEY=9
+
+		// The Challenge Menu
+		If SELECTION=1
+			181->BGCOLOR
+			Call DOORS
+			AsmComp(CHALMENU
+			Call DOORS
+		End
+
+		// Main Menu Help
+		If SELECTION=2
+			SetDraw(0
+			PrintStringXY("Press [mode] anytime for help",60,200
+			PrintStringXY("To return to the previous menu or",43,210
+			PrintStringXY("exit a puzzle, press [clear]",66,220
+			Repeat KEY
+				getKey->KEY
+			End
+			0->KEY
+			SetDraw(1
+		End
+
+		// The About Menu
+		If SELECTION=3
+			181->BGCOLOR
+			Call DOORS
+			FillScreen(181
+			SetTextScale(2,2
+			SetTextBGColor(181
+			SetTextFGColor(0
+			PrintStringXY("ABOUT",120,10
+			SetTextScale(1,1
+			PrintStringXY("Omicron 34 is Captain Calc's spy entry for",20,60
+			PrintStringXY("Cemetech Contest 23",90,75
+			PrintStringXY("Version: 1.0 CE",10,135
+			PrintStringXY("Forum Thread (contest): cemetech/t16070",10,150
+			PrintStringXY("Press [prgm] to view credits",60,220
+			Blit(1
+			Repeat KEY
+				getKey->KEY
+			End
+
+			// The Credits
+			If KEY=31
+				181->BGCOLOR
+				Call DOORS
+				FillScreen(181
+				SetTextScale(2,2
+				PrintStringXY("CREDITS",110,10
+				SetTextScale(1,1
+				PrintStringXY("I would like to thank all of the following",5,40
+				PrintStringXY("for the assistance, advice, and",5,55
+				PrintStringXY("encouragement they gave during this",5,70
+				PrintStringXY("project's development:",5,85
+				PrintStringXY("PT_",150,110
+				PrintStringXY("MateoConLechuga",100,125
+				PrintStringXY("dankcalculatorbro",95,140
+				PrintStringXY("commandblockguy",101,155
+				PrintStringXY("e\psilon5",131,170
+				PrintStringXY("Argus",140,185
+				Blit(1
+				Repeat KEY
+					getKey->KEY
+				End
+
+			End	//If KEY=31
+
+			// Zero the key variable to prevent "fall throughs"
+			0->KEY
+			181->BGCOLOR
+			Call DOORS
+
+		End	//If SELECTION=3 (the About menu)
+
+		// If 'Exit' selected
+		If SELECTION=4
+			15->KEY
+		End
+
+	End // If KEY=54 or KEY=9
+
+End // Repeat KEY=15
+
+// Save game progress to OmicronS
+CloseAll
+Open("OmicronS","r+"->SLOT
+Seek(8,0,SLOT
+Write(^^oWEEK,3,1,SLOT
+Write(^^oPOINTS,3,1,SLOT
+Write(^^oPROGRESS,3,1,SLOT
+Write(^^oMAXOUT,3,1,SLOT
+Write(^^oUPGRADEI,3,1,SLOT
+Write(^^oUPGRADEII,3,1,SLOT
+SetArchiveStatus(1,SLOT
+CloseAll
+det(1

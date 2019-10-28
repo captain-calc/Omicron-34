@@ -1,0 +1,76 @@
+// This program controls which files the scanner selects
+
+// 'A','B','C', and 'D' hold the file numbers it selects
+// 'E','F','G', and 'H' hold the previously selected file numbers
+
+// This ensures that if the number of scanners equals the number of remaining
+// files that one of the remaining files will not be selected
+// That file number is stored to 'I'
+If 10-TOTALHACKED<=NUMSCANS
+	0->X->I
+	Repeat I!=0
+		If 0=L6(3*X
+			X+1->I
+		End
+		X+1->X
+	End
+End
+
+// Select files to scan that are not the same as the previous ones; avoid
+// the file number stored to 'I' as well
+
+SetColor(224
+
+If CURRWEEK>=1
+	Repeat A!=E and A!=F and A!=G and A!=H and A!=I
+		rand->A
+		A/1677722->A
+		A+1->A
+	End
+	Rectangle(36,47+15*(A-1),100,13
+End
+If CURRWEEK>=1
+	Repeat B!=A and B!=E and B!=F and B!=G and B!=H and B!=I
+		rand->B
+		B/1677722->B
+		B+1->B
+	End
+	Rectangle(36,47+15*(B-1),100,13
+End
+If CURRWEEK>=3
+	Repeat C!=A and C!=B and C!=E and C!=F and C!=G and C!=H and C!=I
+		rand->C
+		C/1677722->C
+		C+1->C
+	End
+	Rectangle(36,47+15*(C-1),100,13
+End
+If CURRWEEK>=6
+	Repeat D!=A and D!=B and D!=C and D!=E and D!=F and D!=G and D!=H and D!=I
+		rand->D
+		D/1677722->D
+		D+1->D
+	End
+	Rectangle(36,47+15*(D-1),100,13
+End
+
+Blit(1
+Pause 1000
+
+// Erase the scanner boxes
+SetColor(222
+If CURRWEEK>=1
+	Rectangle(36,47+15*(A-1),100,13
+	Rectangle(36,47+15*(B-1),100,13
+	A->E
+	B->F
+End
+If CURRWEEK>=3
+	Rectangle(36,47+15*(C-1),100,13
+	C->G
+End
+If CURRWEEK>=6
+	Rectangle(36,47+15*(D-1),100,13
+	D->H
+End
+Blit(1

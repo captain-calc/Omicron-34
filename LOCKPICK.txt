@@ -1,0 +1,245 @@
+// This is the Lock Picking puzzle
+
+// Seek the clue offset to the proper set of clues
+CloseAll
+Open("OmicronC","r")->SLOT
+8->OFFSET
+If CURRWEEK=2
+	109->OFFSET
+End
+If CURRWEEK=3
+	242->OFFSET
+End
+If CURRWEEK=4
+	339->OFFSET
+End
+If CURRWEEK=5
+	471->OFFSET
+End
+If CURRWEEK=6
+	594->OFFSET
+End
+If CURRWEEK=7
+	726->OFFSET
+End
+If CURRWEEK=8
+	863->OFFSET
+End
+If CURRWEEK=9
+	992->OFFSET
+End
+If CURRWEEK=10
+	1101->OFFSET
+End
+Seek(OFFSET,0,SLOT
+
+// If this is the player's first time, display help
+If CURRWEEK=1 and P=0
+	3->HELPTYPE
+	Call GAMEAID
+End
+
+// Draw Lock scene
+FillScreen(106
+
+// Gold lock casing
+SetColor(0
+Rectangle(39,59,242,122
+SetColor(205
+FillRectangle(40,60,240,120
+SetColor(255
+Line(42,62,57,62
+Line(42,62,42,100
+SetColor(203
+Line(42,178,57,178
+Line(262,178,277,178
+
+// Door
+SetColor(0
+Rectangle(59,0,202,240
+SetColor(194
+FillRectangle(60,0,200,240
+
+// Clue card
+SetColor(0
+Rectangle(80,10,160,50
+
+//Lock interior
+SetColor(0
+Rectangle(40,108,240,24
+SetColor(181
+FillRectangle(39,109,242,22
+SetColor(0
+Line(60,109,260,109
+Line(60,130,260,130
+
+// Lock Cylinder
+SetColor(107
+FillRectangle(55,70,210,38
+FillRectangle(55,132,210,38
+SetColor(0
+Rectangle(54,69,212,39
+Rectangle(54,132,212,38
+SetColor(105
+Line(57,167,263,167
+
+// Draw control panel
+AsmComp(CTLPANEL
+
+Blit(1
+
+
+1->ATTEMPT
+
+// Store player's points to temporary variable so if the player clears out
+// out of the puzzle before finishing, he will not gain any points
+POINTS->STARTPTS
+
+Repeat ATTEMPT=4 or KEY=15
+
+	// Retreive clue from appvar
+	Read(^^oLENGTH,3,1,SLOT
+	|ELENGTH->LENGTH
+	Read(Str0,LENGTH,1,SLOT
+	Read(Str9,6,1,SLOT
+
+	// Print clue
+	SetColor(255
+	FillRectangle(81,11,158,48
+	SetTextScale(1,1
+	SetTextBGColor(255
+	SetTextFGColor(0
+	SetTextTransparentColor(255
+	inString(Str0,"/"->A
+	If A!=0
+		sub(Str0,0,LENGTH-1-length(A->B
+		PrintStringXY(B,160-GetStringWidth(B)/2,25
+		sub(Str0,length(Str0)+1-length(A),length(A)-1->C
+		PrintStringXY(C,160-GetStringWidth(C)/2,35
+	Else
+		PrintStringXY(Str0,160-GetStringWidth(Str0)/2,30
+	End
+	
+	// Draw picker
+	Sprite(PICK,0,113
+	Sprite(PICK,36,113
+
+	// Set lock tumblers
+	SetColor(181
+	FillRectangle(76,113,200,14
+	For(X,1,6
+		Sprite_NoClip(PIN,48+(30*X),109
+	End
+	1->TUMBLER
+	78->PINPOS
+
+	Blit(1
+
+	Repeat TUMBLER=7 or KEY=15
+		
+		// Wait for keypress
+		Repeat KEY
+			getKey->KEY
+		End
+
+		If KEY=1 or KEY=4
+
+			// Get the correct tumbler move and store it to A
+			sub(Str9,(TUMBLER-1),1->A
+			Compare(A,"0"->B
+
+			// If correct move is made, move pin and add points
+			If TUMBLER<7 and (KEY=1 and B=0) or (KEY=4 and B!=0
+				If KEY=1 or KEY=4
+					SetColor(181
+					FillRectangle(PINPOS,109,16,22
+					Sprite(PICK,PINPOS-20,113
+				End
+				If KEY=1
+					Sprite_NoClip(LOSTUB,PINPOS,127
+				End
+				If KEY=4
+					Sprite_NoClip(HISTUB,PINPOS,109
+				End
+				78+(30*TUMBLER)->PINPOS
+				TUMBLER+1->TUMBLER
+				POINTS+100*(POINTS<99900->POINTS
+			Else				
+				// Reset the lock and deduct points
+				SetColor(181
+				FillRectangle(76,113,200,14
+				Sprite(PICK,36,113
+				For(X,1,6
+					Sprite_NoClip(PIN,48+(30*X),109
+				End
+				1->TUMBLER
+				78->PINPOS
+				POINTS-100*(POINTS>0->POINTS
+			End
+
+			// Update point display; if player made a wrong move make points
+			// flash red
+			SetTextXY(255,225
+			SetTextScale(1,1
+			SetTextBGColor(0
+			SetTextTransparentColor(155
+			If TUMBLER=1
+				SetTextFGColor(225
+				PrintUInt(POINTS,5
+				Blit(1
+				Pause 200
+			End
+			SetTextXY(255,225
+			SetTextFGColor(255
+			PrintUInt(POINTS,5
+			Blit(1
+
+			// If all tumblers are out of the way, draw 'Unlocked' and
+			// add one box to attempts panel
+			If TUMBLER=7
+				// Draw "UNLOCKED" message
+				SetTextScale(2,2
+				SetTextBGColor(107
+				SetTextFGColor(255
+				PrintStringXY("UNLOCKED!",95,145
+				Blit(1
+				For(X,1,10
+					Sprite(HALFSPIN,7+15*(ATTEMPT-1),7
+					Blit(1
+					Pause 30
+					SetColor(0
+					FillRectangle(7+15*(ATTEMPT-1),7,16,16
+					Pause 5
+					SetColor(102
+					FillRectangle(8+15*(ATTEMPT-1),8,10,10
+					Blit(1
+					Pause 30
+				End
+				ATTEMPT+1->ATTEMPT
+				SetColor(107
+				FillRectangle(95,145,135,20
+				Blit(1
+			End
+
+		End	//If KEY=1 or KEY=4
+
+		// If [mode] pressed, display help
+		If KEY=55
+			3->HELPTYPE
+			Call GAMEAID
+		End
+		
+		// If zoom pressed, display codebook
+		If KEY=51
+			AsmComp(CODEBOOK
+		End
+
+	End	//Repeat TUMBLER=7 or KEY=15
+
+End	//Repeat ATTEMPT=4 or KEY=15
+
+If KEY=15
+	STARTPTS->POINTS
+End
+
+CloseAll

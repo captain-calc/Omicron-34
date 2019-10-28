@@ -1,0 +1,343 @@
+// This is the Shop where the player can purchase upgrades
+
+// Set the initial selection box position
+1->XPOS
+1->YPOS
+
+Repeat KEY=15
+
+	FillScreen(181
+
+	// Draw Shop header
+	SetColor(0
+	Rectangle(100,5,120,17
+	SetColor(222
+	FillRectangle(101,6,118,15
+	SetTextScale(1,1
+	SetTextBGColor(222
+	SetTextFGColor(0
+	PrintStringXY("Shop",144,10
+
+	Goto SKIP
+	// This is the icon drawing routine
+	Lbl ICON
+	SetColor(180
+	FillRectangle(A,B,30,28
+	FillRectangle(A+1,B-1,28,30
+	SetColor(107
+	FillRectangle(A+1,B+1,28,26
+	FillRectangle(A+2,B,26,28
+	SetColor(0
+	FillRectangle(A+2,B+2,26,24
+	FillRectangle(A+3,B+1,24,26
+	SetColor(107
+	FillRectangle(A+3,B+3,24,22
+	FillRectangle(A+4,B+2,22,24
+	SetColor(181
+	FillRectangle(A+4,B+4,22,20
+	FillRectangle(A+5,B+3,20,22
+	SetColor(107
+	FillRectangle(A+5,B+5,20,18
+	FillRectangle(A+6,B+4,18,20
+	SetColor(0
+	FillRectangle(A+6,B+6,18,16
+	FillRectangle(A+7,B+5,16,18
+	Return
+
+	// This is the icon selection box erase routine
+	Lbl IERASE
+	SetColor(180
+	Rectangle(XOFF,YOFF,30,30
+	For(X,0,3
+		If XPOS=5 and (X=0 or X=3
+			SetColor(222
+		Else
+			SetColor(181
+		End
+		SetPixel(XOFF+29*(X>1),YOFF+29*(X>0 and X<3)
+	End
+	SetColor(107
+	Rectangle(XOFF+1,YOFF+1,28,28
+	SetColor(180
+	For(X,0,3
+		SetPixel(XOFF+1+27*(X>1),YOFF+1+27*(X>0 and X<3)
+	End
+	Return
+	Lbl SKIP
+
+	// Draw Reset Icon
+	284->A
+	6->B
+	Call ICON
+	Sprite(RESETICON,291,12
+
+	// Draw the 'Locked' icon over all of the upgrades
+	SetColor(0
+	For(X,0,3
+		FillRectangle(27+50*X,59,2,90
+	End
+	For(Y,0,3
+		For(X,0,3
+			13+50*X->A
+			29+40*Y->B
+			Call ICON
+			Sprite(LOCKED,20+50*X,B+6
+		End
+	End
+
+	// Draw 'Buy Omicron 34' spoof
+	SetColor(180
+	FillRectangle(201,43,113,116
+	SetColor(107
+	FillRectangle(202,44,111,114
+	SetColor(0
+	FillRectangle(203,45,109,112
+	SetColor(224
+	FillRectangle(204,46,107,15
+	SetColor(222
+	FillRectangle(204,62,107,94
+	SetTextBGColor(222
+	SetTextFGColor(0
+	PrintStringXY("Get",247,65
+	PrintStringXY("more puzzles,",212,75
+	PrintStringXY("more upgrades,",207,85
+	PrintStringXY("and more fun",215,95
+	PrintStringXY("when you",229,105
+	PrintStringXY("purchase",226,115
+	PrintStringXY("Omicron 34!",220,125
+	SetTextBGColor(224
+	SetTextFGColor(255
+	SetTextTransparentColor(224
+	PrintStringXY("Just 0.99!",226,49
+	246->A
+	145->B
+	Call ICON
+	Sprite(SPOOF,253,151
+
+	// Draw the boxes at the bottom of the screen
+	SetColor(0
+	Rectangle(5,185,120,22
+	Rectangle(5,212,120,22
+	Rectangle(130,185,185,50
+	SetColor(222
+	FillRectangle(6,186,118,20
+	FillRectangle(6,213,118,20
+	SetTextBGColor(222
+	SetTextFGColor(0
+	SetTextTransparentColor(255
+	PrintStringXY("Cost:",10,192
+	PrintStringXY("Points:",10,219
+
+
+	// Selection box loop
+	Repeat KEY=54 or KEY=9 or KEY=55 or KEY=15
+		
+		// Draw Upgrade icons
+		Sprite(CDBKUPI,20,155
+		Sprite(ANTISCUPI,70,155
+		If UPGRADEI>=2
+			Sprite(CDBKUPII,20,115
+		End
+		If UPGRADEII>=2
+			Sprite(ANTISCUPII,70,115
+		End
+		If UPGRADEI>=3
+			Sprite(CDBKUPIII,20,75
+		End
+		If UPGRADEII>=3
+			Sprite(ANTISCUPIII,70,75
+		End
+		If UPGRADEI>=4
+			Sprite(CDBKUPIV,20,35
+		End
+		If UPGRADEII>=4
+			Sprite(ANTISCUPIV,70,35
+		End
+
+		// Depending on which upgrade column is currently selected, store 
+		// that column's upgrade number to CURRUPGRD
+		Alloc(3->CURRUPGRD
+		If XPOS=1
+			UPGRADEI->CURRUPGRD
+		End
+		If XPOS=2
+			UPGRADEII->CURRUPGRD
+		End
+
+		// Erase previous 'Cost' message and Upgrade description
+		SetColor(222
+		FillRectangle(47,192,71,10
+		FillRectangle(131,186,183,48
+
+		// If 'Reset' button not selected, unlocked upgrade column selected,
+		// and upgrade not purchased, display cost; else, display 
+		// 'Purchased'. If one of the last two uprgade columns is selected, 
+		// display 'Locked'
+		If XPOS<5
+			If XPOS<3
+				If CURRUPGRD<YPOS+1
+					SetTextXY(47,192
+					2000*YPOS->COST
+					If POINTS>=COST and CURRUPGRD=YPOS
+						SetTextFGColor(101
+					Else
+						SetTextFGColor(224
+					End
+					PrintUInt(2000*YPOS,4
+				Else
+					SetTextFGColor(101
+					PrintStringXY("Purchased",47,192
+				End
+
+				// Open the description appvar and retreive correct 
+				// description
+				CloseAll
+				Open("OmicronU","r"->SLOT
+				If XPOS=1
+					If YPOS=1
+						8->O
+					End
+					If YPOS=2
+						98->O
+					End
+					If YPOS=3
+						158->O
+					End
+					If YPOS=4
+						205->O
+					End
+				End
+				If XPOS=2
+					If YPOS=1
+						252->O
+					End
+					If YPOS=2
+						346->O
+					End
+					If YPOS=3
+						401->O
+					End
+					If YPOS=4
+						471->O
+					End
+				End
+				Seek(O,0,SLOT
+				Read(^^oLENGTH,3,1,SLOT
+				|ELENGTH->LENGTH
+				Read(Str0,LENGTH,1,SLOT
+				CloseAll
+
+				// Print description
+				SetTextFGColor(0
+				0->S
+				190->L
+				Repeat S>=length(Str0
+					If length(Str0)-S>=24
+						sub(Str0,S,24->A
+					Else
+						sub(Str0,S,length(Str0)-S->A
+					End
+					PrintStringXY(A,135,L
+					S+24->S
+					L+10->L
+				End
+
+			Else // If XPOS<2
+				SetTextFGColor(224
+				PrintStringXY("Locked",47,192
+			End // If XPOS<2
+
+		End // If XPOS<5
+
+		// Print POINTS
+		SetTextFGColor(0
+		SetTextXY(60,219
+		PrintUInt(POINTS,5
+
+		// Selection box movement
+		If XPOS<5
+			13+50*(XPOS-1->XOFF
+			148-40*(YPOS-1->YOFF
+		Else
+			If XPOS=5
+				246->XOFF
+				144->YOFF
+			Else
+				284->XOFF
+				5->YOFF
+			End
+		End
+
+		// Draw selection box
+		SetColor(247
+		Rectangle(XOFF,YOFF,30,30
+		For(X,0,3
+			If XPOS=5 and (X=0 or X=3
+				SetColor(222
+			Else
+				SetColor(181
+			End
+			SetPixel(XOFF+29*(X>1),YOFF+29*(X>0 and X<3)
+		End
+		SetColor(231
+		Rectangle(XOFF+1,YOFF+1,28,28
+		SetColor(247
+		For(X,0,3
+			SetPixel(XOFF+1+27*(X>1),YOFF+1+27*(X>0 and X<3)
+		End
+		Blit(1
+
+		// Wait for keypress
+		Repeat KEY
+			getKey->KEY
+		End
+
+		// Erase selection box
+		If KEY<=4
+			Call IERASE
+		End
+
+		XPOS+(KEY=3 and XPOS<6)-(KEY=2 and XPOS>1)+(KEY=4 and XPOS=5)-(KEY=1 and XPOS=6->XPOS
+		YPOS+(KEY=4 and YPOS<4)-(KEY=1 and YPOS>1->YPOS
+
+	End	// Repeat KEY=54 or KEY=9 or KEY=55 or KEY=15
+	
+	// If player selects an icon, check to see if it is the 'Reset' 
+	// button. If not and and the previous upgrade has been purchased and 
+	// the player has enough POINTS, deduct COST from POINTS
+	If KEY!=15 and KEY!=55
+		If XPOS<3 and YPOS=CURRUPGRD and POINTS>=COST
+			POINTS-COST->POINTS
+			If XPOS=1
+				UPGRADEI+1->UPGRADEI
+			End
+			If XPOS=2
+				UPGRADEII+1->UPGRADEII
+			End
+		End
+
+		// If XPOS=5, run spoof animation
+		If XPOS=5
+			158->BGCOLOR
+			Call DOORS
+			AsmComp(SPOOF
+			181->BGCOLOR
+			Call DOORS
+		End
+
+		// If XPOS=6, display reset prompt dialog
+		If XPOS=6
+			AsmComp(RESET
+		End
+
+	End
+
+	// If [mode] pressed, display help
+	If KEY=55
+		2->HELPTYPE
+		Call GAMEAID
+	End
+
+End // Repeat KEY=15
+
+0->KEY

@@ -1,0 +1,61 @@
+// Draw codebook
+SetColor(0
+Rectangle(9,79,302,162
+SetColor(130
+FillRectangle(10,80,300,160
+SetColor(255
+FillRectangle(13,83,294,157
+SetColor(0
+Rectangle(13,83,294,158
+For(X,0,6,2
+	Line(15+X,83,15+X,240
+	Line(300-X,83,300-X,240
+End
+SetColor(181
+FillRectangle(158,84,4,156
+SetColor(107
+FillRectangle(159,84,2,156
+
+// Draw Pig Latin keys
+SetTextBGColor(255
+SetTextFGColor(0
+PrintStringXY("Pig Latin",60,95
+SetColor(0
+Line(45,104,135,104
+PrintStringXY("desk = eskday",40,120
+PrintStringXY("c\hild = ildchay",40,130
+PrintStringXY("ear = earay",40,140
+PrintStringXY("Silent letters",40,170
+PrintStringXY("appear with",40,180
+PrintStringXY("'()' around them",40,190
+
+// Depending on codebook upgrade, draw Major System keys
+If UPGRADEI>=2
+	PrintStringXY("Major System",180,95
+	Line(175,104,275,104
+	PrintStringXY("t, d = 1",180,120
+	PrintStringXY("n = 2",180,130
+	PrintStringXY("m = 3",180,140
+End
+If UPGRADEI>=3
+	PrintStringXY("r = 4",180,150
+	PrintStringXY("L = 5",180,160
+	PrintStringXY("ch, sh, j = 6",180,170
+End
+If UPGRADEI>=4
+	PrintStringXY("k, g = 7",180,180
+	PrintStringXY("f, v = 8",180,190
+End
+If UPGRADEI>=5
+	PrintStringXY("p, b = 9",180,200
+	PrintStringXY("s, z = 0",180,210
+End
+
+SwapDraw
+
+// Wait for keypress
+Repeat KEY
+	getKey->KEY
+End
+0->KEY
+Blit(1

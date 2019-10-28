@@ -1,0 +1,312 @@
+// This is the Computer Hacking puzzle
+
+Goto COMPHACK
+
+// This is the file hacking window routine
+Lbl FILEHACK
+SetColor(180
+Rectangle(163,88,128,64
+SetColor(107
+Rectangle(164,89,126,62
+SetColor(222
+FillRectangle(165,90,124,60
+SetTextBGColor(222
+SetTextFGColor(0
+PrintStringXY(":",178,116
+SetColor(0
+Rectangle(165,90,124,60
+Line(166,101,288,101
+Rectangle(178,126,100,10
+SetColor(28
+FillRectangle(166,91,122,10
+SetColor(30
+Line(167,92,167,98
+Line(167,92,285,92
+
+If FILE=L6(3*(FILE-1
+	SetColor(101
+	FillRectangle(179,127,98,8
+	PrintStringXY("File Hacked!",183,116
+End
+Return
+
+// This is the warning image
+Lbl WARNING
+SetColor(222
+FillRectangle(161,32,132,176
+SetColor(224
+Rectangle(161,32,132,176
+SetColor(226
+Rectangle(162,33,130,174
+SetTextScale(2,3
+SetTextBGColor(222
+SetTextFGColor(224
+SetTextTransparentColor(222
+PrintStringXY("WARNING",171,40
+SetTextScale(1,1
+PrintStringXY("Susp\icious",190,165
+PrintStringXY("activity",197,175
+PrintStringXY("detected.",195,185
+SetColor(224
+FillTriangle(227,75,182,155,272,155
+SetTextScale(2,5
+SetTextBGColor(224
+SetTextFGColor(255
+SetTextTransparentColor(224
+PrintStringXY("!",225,105
+Return
+Lbl COMPHACK
+
+// If this is the player's first time, display help
+If CURRWEEK=1 and P=1
+	4->HELPTYPE
+	Call GAMEAID
+End
+
+// Draw monitor
+FillScreen(214
+SetColor(180
+FillRectangle(24,7,295,232
+SetColor(0
+FillRectangle(22,6,296,232
+FillRectangle(4,4,312,232
+SetColor(107
+FillRectangle(5,5,310,230
+SetColor(180
+FillRectangle(6,6,308,228
+SetColor(181
+FillRectangle(7,7,306,226
+SetColor(180
+FillRectangle(12,12,296,216
+SetColor(107
+FillRectangle(13,13,294,214
+SetColor(0
+FillRectangle(14,14,292,212
+SetColor(222
+FillRectangle(15,15,290,210
+
+// Draw boxes around file names and image space
+SetColor(0
+Rectangle(22,31,124,178
+Rectangle(160,31,134,178
+
+// Draw file names
+SetTextScale(1,1
+SetTextBGColor(222
+SetTextFGColor(0
+PrintStringXY("Messages",40,50
+PrintStringXY("GAMES",40,65
+PrintStringXY("Pic4.png",40,80
+PrintStringXY("Settings",40,95
+PrintStringXY("WORK",40,110
+PrintStringXY("Build X.bin",40,125
+PrintStringXY("Log.txt",40,140
+PrintStringXY("SYSTEM",40,155
+PrintStringXY("AppData",40,170
+PrintStringXY("Temp",40,185
+
+// If unlocked, charge the Anti-Scan tool and set VIEWTIME
+If UPGRADEII>1
+	10->CHARGE
+	1000*(1+(UPGRADEII>3)+(UPGRADEII>4->VIEWTIME
+End
+
+// Sets the number of hacks needed per attempt
+5+(CURRWEEK>2)+(CURRWEEK-6)*(CURRWEEK>5->HACKGOAL
+
+// Sets the numbeer of scanners
+0->NUMSCANS
+NUMSCANS+2*(CURRWEEK>=1)+(CURRWEEK>=3)+(CURRWEEK>=6->NUMSCANS
+
+// Draw control panel
+AsmComp(CTLPANEL
+
+1->ATTEMPT
+POINTS->STARTPTS
+
+Repeat ATTEMPT=4 or KEY=15
+
+	1->FILE
+	0->TOTALHACKED
+	0->NEWHACK
+	0->ALARM
+	// L6 is where the puzzle keeps track of which files have been hacked
+	CopyData(L6,3,0,0,0,0,0,0,0,0,0,0
+	// These variables are for the SCANFILE program
+	0->A->B->C->D->E->F->G->H
+
+	Repeat TOTALHACKED=HACKGOAL or KEY=15
+
+		//PrintStringXY("Post-scan",5,140
+		Repeat KEY=54 or KEY=9 or KEY=51 or KEY=55 or KEY=15
+
+			// If player has not just hacked a file or recieved a warning,
+			// draw file image and if file is already hacked, draw hacking 
+			// window
+			If NEWHACK!=1 and ALARM!=1
+				AsmComp(HACKIMGS
+				If FILE=L6(3*(FILE-1
+					Call FILEHACK
+				End
+			End
+
+			// If new ATTEMPT or number of files remaining is less than 10 
+			// and the player has made a successful hack
+			If A=0 or ((10-TOTALHACKED)<=NUMSCANS and NEWHACK
+				AsmComp(SCANFILE
+			End
+
+			0->NEWHACK
+			0->ALARM
+
+			// Draw selection box
+			SetColor(0
+			Rectangle(36,47+15*(FILE-1),100,13
+			Blit(1
+
+			// Wait for keypress
+			Repeat KEY
+				getKey->KEY
+			End
+
+				// Erase selection box
+			If KEY=1 or KEY=4
+				SetColor(222
+				Rectangle(36,47+(FILE-1)*15,100,13
+			End
+
+			// Update selection box position and file number
+			FILE+(KEY=1 and FILE<10)-(KEY=4 and FILE>1->FILE
+
+		End	// Repeat KEY=54 or KEY=9 or KEY=51 or KEY=55 or KEY=15
+
+		// If FILE is not being scanned and it is not already hacked,
+		// hack it, add file number to hacked list, add points, and if 
+		//	necessary, recharge the Anti-Scan tool
+		If KEY=54 or KEY=9
+			If FILE!=A and FILE!=B and FILE!=C and FILE!=D
+				If FILE!=L6(3*(FILE-1)
+					// Extraction animation
+					Call FILEHACK
+
+					For(X,1,98
+						SetColor(101
+						FillRectangle(179,127,X,8
+						SetTextFGColor(0
+						PrintStringXY("Hacking.\..",183,116
+						Blit(1
+						Pause 10
+					End
+
+					PrintStringXY("File Hacked!",183,116
+					Blit(1
+					FILE->L6(3*(FILE-1
+					1->NEWHACK
+
+					POINTS+100*(POINTS<99900->POINTS
+
+					If UPGRADEII>1 and CHARGE<10
+						CHARGE+1+(UPGRADEII>2)+3*(UPGRADEII>4->CHARGE
+						SetColor(126
+						For(X,0,(CHARGE-1
+							FillRectangle(306-10*X,8,6,10
+						End
+					End
+					
+				End
+			Else
+				// Alarm animation and point deduction
+				Call WARNING
+				1->ALARM
+
+				POINTS-100*(POINTS>0->POINTS
+			End
+		End
+
+		// Update point display; if the player selected a file that was 
+		// being scanned, make points flash red
+		SetTextXY(255,225
+		SetTextScale(1,1
+		SetTextBGColor(0
+		SetTextTransparentColor(155
+		If ALARM=1
+			SetTextFGColor(225
+			PrintUInt(POINTS,5
+			Blit(1
+			Pause 200
+		End
+		SetTextXY(255,225
+		SetTextFGColor(255
+		PrintUInt(POINTS,5
+		Blit(1
+		SetTextTransparentColor(255
+
+		// If [mode] pressed, display help
+		If KEY=55
+			4->HELPTYPE
+			Call GAMEAID
+		End
+
+		// If Anti-Scan tool activated, display scanner boxes for VIEWTIME
+		If KEY=51 and CHARGE=10
+			SetColor(224
+			If CURRWEEK>=1
+				Rectangle(36,47+15*(A-1),100,13
+				Rectangle(36,47+15*(B-1),100,13
+			End
+			If CURRWEEK>=3
+				Rectangle(36,47+15*(C-1),100,13
+			End
+			If CURRWEEK>=6
+				Rectangle(36,47+15*(D-1),100,13
+			End
+			Blit(1
+			Pause VIEWTIME
+			SetColor(222
+			If CURRWEEK>=1
+				Rectangle(36,47+15*(A-1),100,13
+				Rectangle(36,47+15*(B-1),100,13
+			End
+			If CURRWEEK>=3
+				Rectangle(36,47+15*(C-1),100,13
+			End
+			If CURRWEEK>=6
+				Rectangle(36,47+15*(D-1),100,13
+			End
+			Blit(1
+			0->CHARGE
+			SetColor(181
+			For(X,0,9
+				FillRectangle(216+10*X,8,6,10
+			End
+		End
+
+		TOTALHACKED+NEWHACK->TOTALHACKED
+		
+	End	// Repeat TOTALHACKED=HACKGOAL or KEY=15
+
+	// If player has hacked all of the files required for the attempt
+	// add box to attempts panel
+	If TOTALHACKED=HACKGOAL
+		For(X,1,10
+			Sprite(HALFSPIN,7+15*(ATTEMPT-1),7
+			Blit(1
+			Pause 30
+			SetColor(0
+			FillRectangle(7+15*(ATTEMPT-1),7,16,16
+			Pause 5
+			SetColor(102
+			FillRectangle(8+15*(ATTEMPT-1),8,10,10
+			Blit(1
+			Pause 30
+		End
+		ATTEMPT+1->ATTEMPT
+		SetColor(222
+		Rectangle(36,47+(FILE-1)*15,100,13
+	End
+
+End	// Repeat ATTEMPT=4 or KEY=15
+
+If KEY=15
+	STARTPTS->POINTS
+End
